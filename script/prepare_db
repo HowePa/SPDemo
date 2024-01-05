@@ -1,0 +1,3 @@
+#!/bin/bash
+
+clickhouse-client --host ${SP_CLICKHOUSE_HOST} --port ${SP_CLICKHOUSE_PORT} --queries-file ${SP_SRC_DIR}/create.sql
