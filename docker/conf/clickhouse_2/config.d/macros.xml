@@ -1,0 +1,5 @@
+<clickhouse>
+    <macros>
+        <instance>sp-ch-2</instance>
+    </macros>
+</clickhouse>

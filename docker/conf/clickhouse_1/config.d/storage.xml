@@ -1,0 +1,24 @@
+<clickhouse>
+    <storage_configuration>
+        <disks>
+            <hdfs>
+                <type>hdfs</type>
+                <endpoint>hdfs://sp-hdfs:9000/sptest/</endpoint>
+                <skip_access_check>true</skip_access_check>
+            </hdfs>
+        </disks>
+        <policies>
+            <hot_and_cold>
+                <volumes>
+                    <hot>
+                        <disk>default</disk>
+                    </hot>
+                    <cold>
+                        <disk>hdfs</disk>
+                    </cold>
+                </volumes>
+                <move_factor>0.1</move_factor>
+            </hot_and_cold>
+        </policies>
+    </storage_configuration>
+</clickhouse>

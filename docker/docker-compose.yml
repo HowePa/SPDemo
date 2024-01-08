@@ -1,0 +1,116 @@
+version: "3"
+
+networks:
+  sptest:
+    driver: bridge
+
+services:
+  sp-zk:
+    image: zookeeper:3.6.2
+    hostname: sp-zk
+    restart: always
+    networks:
+      - sptest
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=zoo1:2888:3888;2181
+    security_opt:
+      - label:disable
+
+  sp-hdfs:
+    image: sequenceiq/hadoop-docker:2.7.0
+    restart: always
+    hostname: sp-hdfs
+    networks:
+      - sptest
+    environment:
+      HDFS_HOST: sp-hdfs
+    entrypoint: /etc/bootstrap.sh -d
+    volumes:
+      - ${SP_DATA_DIR:-./data}/hdfs/logs:/usr/local/hadoop/logs
+
+  sp-kafka:
+    image: confluentinc/cp-kafka:5.2.0
+    restart: always
+    hostname: sp-kafka
+    networks:
+      - sptest
+    depends_on:
+      - sp-zk
+    ports:
+      - ${SP_KAFKA_PORT}:${SP_KAFKA_PORT}
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://localhost:${SP_KAFKA_PORT},OUTSIDE://sp-kafka:19092
+      KAFKA_ADVERTISED_HOST_NAME: sp-kafka
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: sp-zk:2181
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    security_opt:
+      - label:disable
+
+  sp-ch-1:
+    image: clickhouse/clickhouse-server:23.8
+    hostname: sp-ch-1
+    restart: always
+    networks:
+      - sptest
+    depends_on:
+      - sp-zk
+      - sp-hdfs
+      - sp-kafka
+    ports:
+      - ${SP_CLICKHOUSE_HTTP_PORT}:9000
+      - ${SP_CLICKHOUSE_TCP_PORT}:8123
+    environment:
+      CLICKHOUSE_WATCHDOG_ENABLE: 0
+      CLICKHOUSE_NATS_TLS_SECURE: 0
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - ${SP_DATA_DIR:-./data}/clickhouse_1/data:/var/lib/clickhouse/
+      - ${SP_DATA_DIR:-./data}/clickhouse_1/log:/var/log/clickhouse-server/
+      - ${SP_CLICKHOUSE_CONF_DIR:-./conf}/clickhouse_1/config.d:/etc/clickhouse-server/config.d
+    entrypoint: bash -c "trap 'pkill tail' INT TERM; clickhouse server --config-file=/etc/clickhouse-server/config.xml --log-file=/var/log/clickhouse-server/clickhouse-server.log --errorlog-file=/var/log/clickhouse-server/clickhouse-server.err.log --daemon; coproc tail -f /dev/null; wait $$!"
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+      - IPC_LOCK
+      - SYS_NICE
+      # for umount/mount on fly
+      - SYS_ADMIN
+    
+  sp-ch-2:
+    image: clickhouse/clickhouse-server:23.8
+    hostname: sp-ch-2
+    restart: always
+    networks:
+      - sptest
+    depends_on:
+      - sp-zk
+      - sp-hdfs
+      - sp-kafka
+    environment:
+      CLICKHOUSE_WATCHDOG_ENABLE: 0
+      CLICKHOUSE_NATS_TLS_SECURE: 0
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - ${SP_DATA_DIR:-./data}/clickhouse_2/data:/var/lib/clickhouse/
+      - ${SP_DATA_DIR:-./data}/clickhouse_2/log:/var/log/clickhouse-server/
+      - ${SP_CLICKHOUSE_CONF_DIR:-./conf}/clickhouse_2/config.d:/etc/clickhouse-server/config.d
+    entrypoint: bash -c "trap 'pkill tail' INT TERM; clickhouse server --config-file=/etc/clickhouse-server/config.xml --log-file=/var/log/clickhouse-server/clickhouse-server.log --errorlog-file=/var/log/clickhouse-server/clickhouse-server.err.log --daemon; coproc tail -f /dev/null; wait $$!"
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+      - IPC_LOCK
+      - SYS_NICE
+      # for umount/mount on fly
+      - SYS_ADMIN
+      
