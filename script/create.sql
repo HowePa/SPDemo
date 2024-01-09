@@ -1,35 +1,48 @@
 CREATE DATABASE IF NOT EXISTS sptest ON CLUSTER spcluster;
 
--- Kafka engine table for consuming streaming data
+-- Kafka consumer table
 CREATE TABLE IF NOT EXISTS sptest.kafka_src_table ON CLUSTER spcluster
 (
-    id Int32,
-    name String,
-    message String
+    `timestamp` DateTime('Asia/Shanghai'),
+    `id` Int32,
+    `message` String
 )
-ENGINE = Kafka()
-SETTINGS
-    kafka_broker_list = 'localhost:9092',
-    kafka_topic_list = 'test',
-    kafka_group_name = 'group1',
-    kafka_format = 'JSONEachRow';
+ENGINE = Kafka
+SETTINGS 
+    kafka_broker_list = 'sp-kafka:9092', 
+    kafka_topic_list = 'test', 
+    kafka_group_name = 'sptest', 
+    kafka_format = 'CSV', 
+    kafka_row_delimiter = '\n', 
+    format_csv_delimiter = '|', 
+    kafka_skip_broken_messages = 100, 
+    kafka_handle_error_mode = 'stream';
 
--- MergeTree engine table with storing data in HDFS 
-CREATE TABLE IF NOT EXISTS kafka_table_local ON CLUSTER spcluster
+-- MergeTree table using hot_and_cold policy with cold data store to HDFS
+CREATE TABLE IF NOT EXISTS sptest.kafka_table_local ON CLUSTER spcluster
 (
-    id Int32,
-    name String,
-    message String
+    `timestamp` DateTime('Asia/Shanghai'),
+    `id` Int32,
+    `message` String
 )
-ENGINE = MergeTree()
-ORDER BY (id)
-SETTINGS storage_policy = 'hot_and_cold',
-TTL date + INTERVAL 1 HOUR TO VOLUME 'cold';
+ENGINE = MergeTree
+ORDER BY id
+TTL timestamp TO VOLUME 'hot', timestamp + toIntervalHour(1) TO VOLUME 'cold'
+SETTINGS storage_policy = 'hot_and_cold';
+
+-- Distributed table
+CREATE TABLE IF NOT EXISTS sptest.kafka_table ON CLUSTER spcluster
+(
+    `timestamp` DateTime('Asia/Shanghai'),
+    `id` Int32,
+    `message` String
+)
+ENGINE = Distributed('spcluster', 'sptest', 'kafka_table_local', rand());
 
 -- Materialized view for tranforming data
-CREATE MATERIALIZED VIEW consumer ON CLUSTER spcluster TO kafka_table_local AS
+CREATE MATERIALIZED VIEW sptest.kafka_table_mv ON CLUSTER spcluster TO sptest.kafka_table AS
 SELECT
+    timestamp,
     id,
-    name,
     message
-FROM kafka_src_table;
+FROM sptest.kafka_src_table;
