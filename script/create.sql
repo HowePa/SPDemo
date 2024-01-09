@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS sptest.kafka_src_table ON CLUSTER spcluster
 ENGINE = Kafka
 SETTINGS 
     kafka_broker_list = 'sp-kafka:9092', 
-    kafka_topic_list = 'test', 
+    kafka_topic_list = 'sptest', 
     kafka_group_name = 'sptest', 
     kafka_format = 'CSV', 
     kafka_row_delimiter = '\n', 
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS sptest.kafka_table_local ON CLUSTER spcluster
 )
 ENGINE = MergeTree
 ORDER BY id
-TTL timestamp TO VOLUME 'hot', timestamp + toIntervalHour(1) TO VOLUME 'cold'
+TTL timestamp TO VOLUME 'hot', timestamp + INTERVAL 10 MINUTE TO VOLUME 'cold'
 SETTINGS storage_policy = 'hot_and_cold';
 
 -- Distributed table
