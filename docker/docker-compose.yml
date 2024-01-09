@@ -11,6 +11,8 @@ services:
     restart: always
     networks:
       - sptest
+    ports:
+      - ${SP_ZOOKEEPER_PORT}:2181
     environment:
       ZOO_MY_ID: 1
       ZOO_SERVERS: server.1=zoo1:2888:3888;2181
@@ -40,8 +42,7 @@ services:
     ports:
       - ${SP_KAFKA_PORT}:${SP_KAFKA_PORT}
     environment:
-      KAFKA_ADVERTISED_LISTENERS: INSIDE://localhost:${SP_KAFKA_PORT},OUTSIDE://sp-kafka:19092
-      KAFKA_ADVERTISED_HOST_NAME: sp-kafka
+      KAFKA_ADVERTISED_LISTENERS: OUTSIDE://localhost:${SP_KAFKA_PORT},INSIDE://sp-kafka:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_BROKER_ID: 1
