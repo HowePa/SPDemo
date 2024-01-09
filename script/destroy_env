@@ -1,0 +1,6 @@
+#!/bin/bash
+
+pushd ${SP_SRC_DIR}/docker
+docker compose down
+rm -r ./data
+popd

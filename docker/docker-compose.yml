@@ -7,6 +7,7 @@ networks:
 services:
   sp-zk:
     image: zookeeper:3.6.2
+    container_name: sp-zk
     hostname: sp-zk
     restart: always
     networks:
@@ -21,6 +22,7 @@ services:
 
   sp-hdfs:
     image: sequenceiq/hadoop-docker:2.7.0
+    container_name: sp-hdfs
     restart: always
     hostname: sp-hdfs
     networks:
@@ -33,6 +35,7 @@ services:
 
   sp-kafka:
     image: confluentinc/cp-kafka:5.2.0
+    container_name: sp-kafka
     restart: always
     hostname: sp-kafka
     networks:
@@ -54,6 +57,7 @@ services:
 
   sp-ch-1:
     image: clickhouse/clickhouse-server:23.8
+    container_name: sp-ch-1
     hostname: sp-ch-1
     restart: always
     networks:
@@ -87,6 +91,7 @@ services:
     
   sp-ch-2:
     image: clickhouse/clickhouse-server:23.8
+    container_name: sp-ch-2
     hostname: sp-ch-2
     restart: always
     networks:

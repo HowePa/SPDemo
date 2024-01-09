@@ -1,2 +1,8 @@
 #!/bin/bash
 
+pushd ${SP_SRC_DIR}/docker
+docker compose up -d
+sleep 2     # waiting to pass hdfs safe mode
+docker exec -it sp-hdfs /usr/local/hadoop/bin/hdfs dfs -mkdir /sptest
+docker exec -it sp-hdfs /usr/local/hadoop/bin/hdfs dfs -ls /
+popd
