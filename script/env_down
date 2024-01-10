@@ -2,5 +2,5 @@
 
 pushd ${SP_SRC_DIR}/docker>/dev/null
 docker-compose down
-rm -r ./data
+rm -r $SP_DATA_DIR
 popd>/dev/null
