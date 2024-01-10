@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS sptest.kafka_table_local ON CLUSTER spcluster
 )
 ENGINE = MergeTree
 ORDER BY id
-TTL timestamp TO VOLUME 'hot', timestamp + INTERVAL 10 MINUTE TO VOLUME 'cold'
+TTL timestamp TO VOLUME 'hot', timestamp + INTERVAL 2 HOUR TO VOLUME 'cold'
 SETTINGS storage_policy = 'hot_and_cold';
 
 -- Distributed table
