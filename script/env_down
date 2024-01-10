@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pushd ${SP_SRC_DIR}/docker
+pushd ${SP_SRC_DIR}/docker>/dev/null
 docker-compose down
 rm -r ./data
-popd
+popd>/dev/null
