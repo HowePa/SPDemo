@@ -3,7 +3,7 @@
 pushd ${SP_SRC_DIR}/docker
 
 # startup env
-docker compose up -d
+docker-compose up -d
 
 # init hdfs path
 sleep 2     # waiting to pass hdfs safe mode
