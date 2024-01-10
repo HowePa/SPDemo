@@ -92,9 +92,9 @@ def single_producer(args):
             producer.produce(args.topic, value=data[1])
             producer.flush()
             nitems += data[0]
-            if int(nitems / 100) > logn:
+            if int(nitems / 10000) > logn:
                 logger.info(f"produced {nitems} messages.")
-                logn = int(nitems / 100)
+                logn = int(nitems / 10000)
 
             sleep(random.randint(0, args.interval))
             end_time = time() - start_time
