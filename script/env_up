@@ -6,9 +6,12 @@ pushd ${SP_SRC_DIR}/docker
 docker-compose up -d
 
 # init hdfs path
-sleep 2     # waiting to pass hdfs safe mode
-docker exec -it sp-hdfs /usr/local/hadoop/bin/hdfs dfs -mkdir /sptest
-docker exec -it sp-hdfs /usr/local/hadoop/bin/hdfs dfs -ls /
+while [ $(docker exec -it sp-hdfs /usr/local/hadoop/bin/hdfs dfs -mkdir /sptest) != "" ]; do
+    sleep 1 # waiting to pass hdfs safe mode
+done
+docker exec -it sp-hdfs /usr/local/hadoop/bin/hdfs dfs -ls /user
+
+bin/hdfs dfs -mkdir /user.sptest 2>/dev/null && echo 1 || echo 2
 
 # create topic "sptest"
 docker exec -it sp-kafka /usr/bin/kafka-topics --create --bootstrap-server sp-kafka:9092 --topic sptest --replication-factor 1 --partitions 3
