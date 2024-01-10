@@ -1,24 +1,32 @@
 <clickhouse>
     <storage_configuration>
         <disks>
-            <hdfs>
+            <hdfs_disk>
                 <type>hdfs</type>
                 <endpoint>hdfs://sp-hdfs:9000/sptest/</endpoint>
-                <skip_access_check>true</skip_access_check>
-            </hdfs>
+                <path_prefix>node233</path_prefix>
+            </hdfs_disk>
         </disks>
+
         <policies>
             <hot_and_cold>
                 <volumes>
                     <hot>
                         <disk>default</disk>
+                        <prefer_not_to_merge>true</prefer_not_to_merge>
                     </hot>
                     <cold>
-                        <disk>hdfs</disk>
+                        <disk>hdfs_disk</disk>
+                        <perform_ttl_move_on_insert>false</perform_ttl_move_on_insert>
+                        <prefer_not_to_merge>true</prefer_not_to_merge>
                     </cold>
                 </volumes>
-                <move_factor>0.1</move_factor>
             </hot_and_cold>
-        </policies>
+         </policies>
     </storage_configuration>
+
+    <merge_tree>
+        <ttl_only_drop_parts>true</ttl_only_drop_parts>
+        <merge_with_ttl_timeout>300</merge_with_ttl_timeout>
+    </merge_tree>
 </clickhouse>
