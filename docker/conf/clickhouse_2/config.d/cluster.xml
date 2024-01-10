@@ -7,6 +7,9 @@
                     <host>sp-ch-1</host>
                     <port>9000</port>
                 </replica>
+            </shard>
+            <shard>
+                <internal_replication>true</internal_replication>
                 <replica>
                     <host>sp-ch-2</host>
                     <port>9000</port>
