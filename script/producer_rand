@@ -98,7 +98,7 @@ def single_producer(args):
 
             sleep(random.randint(0, args.interval))
             end_time = time() - start_time
-            if int(end_time / 3600) > args.time:
+            if int(end_time / 3600) >= args.time:
                 logger.info(f"finished after {int(end_time / 3600)} hours produced {nitems} items.")
                 break
     except Exception as e:
