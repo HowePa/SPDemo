@@ -3,9 +3,12 @@ CREATE DATABASE IF NOT EXISTS sptest ON CLUSTER spcluster;
 -- Kafka consumer table
 CREATE TABLE IF NOT EXISTS sptest.kafka_src_table ON CLUSTER spcluster
 (
-    `timestamp` DateTime('Asia/Shanghai'),
+    `timestamp` DateTime,
     `id` Int32,
-    `message` String
+    `name` String,
+    `address` String,
+    `email` String,
+    `phone` String
 )
 ENGINE = Kafka
 SETTINGS 
@@ -21,21 +24,27 @@ SETTINGS
 -- MergeTree table using hot_and_cold policy with cold data store to HDFS
 CREATE TABLE IF NOT EXISTS sptest.kafka_table_local ON CLUSTER spcluster
 (
-    `timestamp` DateTime('Asia/Shanghai'),
+    `timestamp` DateTime,
     `id` Int32,
-    `message` String
+    `name` String,
+    `address` String,
+    `email` String,
+    `phone` String
 )
 ENGINE = MergeTree
 ORDER BY id
-TTL timestamp TO VOLUME 'hot', timestamp + INTERVAL 2 HOUR TO VOLUME 'cold'
+TTL timestamp TO VOLUME 'hot', timestamp + INTERVAL 1 HOUR TO VOLUME 'cold'
 SETTINGS storage_policy = 'hot_and_cold';
 
 -- Distributed table
 CREATE TABLE IF NOT EXISTS sptest.kafka_table ON CLUSTER spcluster
 (
-    `timestamp` DateTime('Asia/Shanghai'),
+    `timestamp` DateTime,
     `id` Int32,
-    `message` String
+    `name` String,
+    `address` String,
+    `email` String,
+    `phone` String
 )
 ENGINE = Distributed('spcluster', 'sptest', 'kafka_table_local', rand());
 
@@ -44,5 +53,8 @@ CREATE MATERIALIZED VIEW sptest.kafka_table_mv ON CLUSTER spcluster TO sptest.ka
 SELECT
     timestamp,
     id,
-    message
+    name,
+    address,
+    email,
+    phone
 FROM sptest.kafka_src_table;
