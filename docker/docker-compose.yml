@@ -65,8 +65,7 @@ services:
       - sp-hdfs
       - sp-kafka
     ports:
-      - ${SP_CLICKHOUSE_HTTP_PORT}:8123
-      - ${SP_CLICKHOUSE_TCP_PORT}:9000
+      - ${SP_CLICKHOUSE_1_PORT}:9000
     environment:
       CLICKHOUSE_WATCHDOG_ENABLE: 0
       CLICKHOUSE_NATS_TLS_SECURE: 0
@@ -101,6 +100,8 @@ services:
       - sp-zk
       - sp-hdfs
       - sp-kafka
+    ports:
+      - ${SP_CLICKHOUSE_2_PORT}:9000
     environment:
       CLICKHOUSE_WATCHDOG_ENABLE: 0
       CLICKHOUSE_NATS_TLS_SECURE: 0
