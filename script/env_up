@@ -17,14 +17,14 @@ docker-compose up -d
 
 # init hdfs path
 echo "init hdfs path..."
-while [ "$(docker exec -it sp-hdfs /usr/local/hadoop/bin/hdfs dfs -mkdir /user/sptest)" != "" ]; do
+while [ "$(docker exec -it sp-hdfs /usr/local/hadoop/bin/hdfs dfs -mkdir /user/${SP_KAFKA_TOPIC})" != "" ]; do
     sleep 1 # waiting to pass hdfs safe mode
 done
 echo "> ls /user"
 docker exec -it sp-hdfs /usr/local/hadoop/bin/hdfs dfs -ls /user
 
 # create topic "sptest"
-docker exec -it sp-kafka /usr/bin/kafka-topics --bootstrap-server sp-kafka:9092 --create --topic sptest --replication-factor 1 --partitions 3
+docker exec -it sp-kafka /usr/bin/kafka-topics --bootstrap-server sp-kafka:9092 --create --topic ${SP_KAFKA_TOPIC} --replication-factor 1 --partitions 3
 echo "> list topics"
 docker exec -it sp-kafka /usr/bin/kafka-topics --bootstrap-server sp-kafka:9092 --list
 
