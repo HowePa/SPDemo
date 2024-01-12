@@ -2,5 +2,5 @@
 
 clickhouse-client \
     --host ${SP_CLICKHOUSE_HOST} \
-    --port ${SP_CLICKHOUSE_PORT} \
+    --port ${SP_CLICKHOUSE_1_PORT} \
     --queries-file ${SP_SRC_DIR}/script/drop.sql
