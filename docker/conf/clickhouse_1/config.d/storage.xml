@@ -4,7 +4,7 @@
             <hdfs_disk>
                 <type>hdfs</type>
                 <endpoint>hdfs://sp-hdfs:9000/user/sptest/</endpoint>
-                <path_prefix>sptest</path_prefix>
+                <path_prefix>node1</path_prefix>
             </hdfs_disk>
         </disks>
 

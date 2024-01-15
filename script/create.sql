@@ -32,8 +32,9 @@ CREATE TABLE IF NOT EXISTS sptest.kafka_table_local ON CLUSTER spcluster
     `phone` String
 )
 ENGINE = MergeTree
-ORDER BY id
-TTL timestamp TO VOLUME 'hot', timestamp + INTERVAL 1 HOUR TO VOLUME 'cold'
+ORDER BY toStartOfMinute(timestamp)
+PARTITION BY toStartOfFiveMinutes(timestamp)
+TTL toStartOfMinute(timestamp) TO VOLUME 'hot', toStartOfMinute(timestamp) + INTERVAL 5 MINUTE TO VOLUME 'cold'
 SETTINGS storage_policy = 'hot_and_cold';
 
 -- Distributed table
@@ -46,7 +47,7 @@ CREATE TABLE IF NOT EXISTS sptest.kafka_table ON CLUSTER spcluster
     `email` String,
     `phone` String
 )
-ENGINE = Distributed('spcluster', 'sptest', 'kafka_table_local', rand());
+ENGINE = Distributed('spcluster', 'sptest', 'kafka_table_local', sipHash64(id));
 
 -- Materialized view for tranforming data
 CREATE MATERIALIZED VIEW sptest.kafka_table_mv ON CLUSTER spcluster TO sptest.kafka_table AS
