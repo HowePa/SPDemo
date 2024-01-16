@@ -2,7 +2,7 @@
 
 ## Prepare
 
-1. 安装依赖环境 `pip install -r requirements.txt`
+1. 安装依赖环境 `python -m pip install -r requirements.txt`
 2. 依照`env.sh.sample`创建`env.sh`并加载
 
 ## Running

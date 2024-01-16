@@ -7,17 +7,18 @@ import os
 import argparse
 from time import time, sleep
 from datetime import datetime, timedelta
+from pytz import timezone
 import random
 from faker import Faker
 import logging
 
 
-logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(process)d - [%(levelname)s]: %(message)s', datefmt='%Y/%m/%d %I:%M:%S')
+logging.basicConfig(level = logging.INFO, format = '%(asctime)s - %(process)d - [%(levelname)s]: %(message)s', datefmt='%Y/%m/%d %I:%M:%S')
 logger = logging.getLogger(__name__)
 
 
 def gen_timestamp():
-    tmpt = datetime.now() - timedelta(minutes=random.randint(2, 8))
+    tmpt = timezone('Asia/Shanghai').localize(datetime.now()) - timedelta(minutes=random.randint(2, 8))
     return tmpt.strftime("%Y-%m-%d %H:%M:%S")
     
 
