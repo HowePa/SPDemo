@@ -12,8 +12,9 @@ SP_CLICKHOUSE_2_PORT=$SP_CLICKHOUSE_2_PORT
 SP_CLICKHOUSE_CONF_DIR=./conf
 SP_CLICKHOUSE_BIN_DIR=$SP_CLICKHOUSE_BIN_DIR">.env
 
-# startup env
-docker-compose up -d
+# startup dependents env
+echo "startup dependents..."
+docker-compose -f docker-compose-deps.yml -p sptest_deps up -d
 
 # init hdfs path
 echo "init hdfs path..."
@@ -27,5 +28,9 @@ docker exec -it sp-hdfs /usr/local/hadoop/bin/hdfs dfs -ls /user
 docker exec -it sp-kafka /usr/bin/kafka-topics --bootstrap-server sp-kafka:9092 --create --topic ${SP_KAFKA_TOPIC} --replication-factor 1 --partitions 3
 echo "> list topics"
 docker exec -it sp-kafka /usr/bin/kafka-topics --bootstrap-server sp-kafka:9092 --list
+
+# startup clickhouse env
+echo "startup clickhouse cluster..."
+docker-compose -f docker-compose.yml -p sptest up -d
 
 popd>/dev/null

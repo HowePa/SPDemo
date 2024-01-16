@@ -1,0 +1,54 @@
+version: "3"
+
+networks:
+  sptest:
+    driver: bridge
+
+services:
+  sp-zk:
+    image: zookeeper:3.6.2
+    container_name: sp-zk
+    hostname: sp-zk
+    restart: always
+    networks:
+      - sptest
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=zoo1:2888:3888;2181
+    security_opt:
+      - label:disable
+
+  sp-hdfs:
+    image: sequenceiq/hadoop-docker:2.7.0
+    container_name: sp-hdfs
+    restart: always
+    hostname: sp-hdfs
+    networks:
+      - sptest
+    environment:
+      HDFS_HOST: sp-hdfs
+    entrypoint: /etc/bootstrap.sh -d
+    volumes:
+      - ${SP_DATA_DIR:-./data}/hdfs/logs:/usr/local/hadoop/logs
+
+  sp-kafka:
+    image: confluentinc/cp-kafka:5.2.0
+    container_name: sp-kafka
+    restart: always
+    hostname: sp-kafka
+    networks:
+      - sptest
+    depends_on:
+      - sp-zk
+    ports:
+      - ${SP_KAFKA_PORT}:${SP_KAFKA_PORT}
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: OUTSIDE://${SP_KAFKA_HOST}:${SP_KAFKA_PORT},INSIDE://sp-kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: sp-zk:2181
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    security_opt:
+      - label:disable
