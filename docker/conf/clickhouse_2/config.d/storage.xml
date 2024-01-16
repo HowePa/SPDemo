@@ -1,9 +1,9 @@
 <clickhouse>
     <storage_configuration>
         <disks>
-            <local>
-                <path>/var/lib/clickhouse/local/</path>
-            </local>
+            <local_disk>
+                <path>/var/lib/clickhouse/local_disk/</path>
+            </local_disk>
             <hdfs_disk>
                 <type>hdfs</type>
                 <endpoint>hdfs://sp-hdfs:9000/user/sptest/</endpoint>
@@ -15,7 +15,7 @@
             <hot_and_cold>
                 <volumes>
                     <hot>
-                        <disk>default</disk>
+                        <disk>local_disk</disk>
                     </hot>
                     <cold>
                         <disk>hdfs_disk</disk>
