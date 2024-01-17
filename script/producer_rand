@@ -55,15 +55,14 @@ def parse_args():
     parser.add_argument(
         "--process",
         type=int,
-        default=3,
-        choices=range(1, max(2, os.cpu_count() - 3)),
-        help="size of process pool(also num of processes)."
+        default=max(1, int(os.cpu_count() / 2)),
+        help=f"num of processes, max to {os.cpu_count()}."
     )
     parser.add_argument(
         "--time",
         type=int,
         default=2,
-        help="running time(hour) for echo process."
+        help="running time(hour) of echo process."
     )
     parser.add_argument(
         "--tsl",
@@ -81,13 +80,13 @@ def parse_args():
         "--interval",
         type=int,
         default=5,
-        help="max interval(second) between production of each data set."
+        help="max time(second) interval per production."
     )
     parser.add_argument(
         "--size",
         type=int,
         default=1000,
-        help="max number of items per data set."
+        help="max number of data entries per production."
     )
     args = parser.parse_args()
     
