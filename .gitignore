@@ -163,5 +163,6 @@ docker/log
 bin/
 env.sh
 .env
-docker/conf/keytabs/*.keytab
-docker/conf/keytabs/krb5.conf
+*.keytab
+krb5.conf
+test.sql

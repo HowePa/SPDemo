@@ -74,7 +74,7 @@ create_admin_user() {
 }
 
 create_keytabs() {
-    rm /etc/kerberos/*.keytab
+    rm /etc/kerberos/*.keytab /etc/kerberos/krb5.conf
 
     kadmin.local -q "addprinc -randkey zookeeper/sp-zk.sptest_deps_sptest@${REALM}"
     kadmin.local -q "addprinc -randkey zkclient@${REALM}"
