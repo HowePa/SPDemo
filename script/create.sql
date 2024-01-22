@@ -33,9 +33,7 @@ CREATE TABLE IF NOT EXISTS sptest.kafka_table_local ON CLUSTER spcluster
 )
 ENGINE = MergeTree
 ORDER BY toStartOfMinute(timestamp)
-PARTITION BY toStartOfFiveMinutes(timestamp)
-TTL toStartOfMinute(timestamp) TO VOLUME 'hot', toStartOfMinute(timestamp) + INTERVAL 5 MINUTE TO VOLUME 'cold'
-SETTINGS storage_policy = 'hot_and_cold';
+PARTITION BY toStartOfFiveMinutes(timestamp);
 
 -- Distributed table
 CREATE TABLE IF NOT EXISTS sptest.kafka_table ON CLUSTER spcluster

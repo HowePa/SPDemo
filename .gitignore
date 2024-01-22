@@ -159,6 +159,9 @@ cython_debug/
 #.idea/
 
 docker/data
+docker/log
 bin/
 env.sh
 .env
+docker/conf/keytabs/*.keytab
+docker/conf/keytabs/krb5.conf

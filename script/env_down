@@ -3,5 +3,5 @@
 pushd ${SP_SRC_DIR}/docker>/dev/null
 docker-compose -f docker-compose.yml -p sptest down
 docker-compose -f docker-compose-deps.yml -p sptest_deps down
-rm -r $SP_DATA_DIR
+rm -r $SP_DATA_DIR $SP_LOG_DIR
 popd>/dev/null

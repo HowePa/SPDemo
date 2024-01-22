@@ -4,12 +4,15 @@ pushd ${SP_SRC_DIR}/docker>/dev/null
 
 # build env file
 mkdir -p $SP_DATA_DIR
+mkdir -p $SP_LOG_DIR
+
 echo "SP_DATA_DIR=$SP_DATA_DIR
+SP_LOG_DIR=$SP_LOG_DIR
+SP_CONF_DIR=$SP_SRC_DIR/docker/conf
 SP_KAFKA_HOST=$SP_KAFKA_HOST
 SP_KAFKA_PORT=$SP_KAFKA_PORT
 SP_CLICKHOUSE_1_PORT=$SP_CLICKHOUSE_1_PORT
 SP_CLICKHOUSE_2_PORT=$SP_CLICKHOUSE_2_PORT
-SP_CLICKHOUSE_CONF_DIR=$SP_SRC_DIR/docker/conf
 SP_CLICKHOUSE_BIN_DIR=$SP_CLICKHOUSE_BIN_DIR">.env
 
 cat .env
@@ -18,18 +21,10 @@ cat .env
 echo "startup dependents..."
 docker-compose -f docker-compose-deps.yml -p sptest_deps up -d
 
-# init hdfs path
-echo "init hdfs path..."
-while [ "$(docker exec -it sp-hdfs /usr/local/hadoop/bin/hdfs dfs -mkdir /user/${SP_KAFKA_TOPIC})" != "" ]; do
-    sleep 1 # waiting to pass hdfs safe mode
-done
-echo "> ls /user"
-docker exec -it sp-hdfs /usr/local/hadoop/bin/hdfs dfs -ls /user
-
 # create topic "sptest"
-docker exec -it sp-kafka /usr/bin/kafka-topics --bootstrap-server sp-kafka:9092 --create --topic ${SP_KAFKA_TOPIC} --replication-factor 1 --partitions 3
+docker exec -it sp-kafka /usr/bin/kafka-topics --bootstrap-server sp-kafka:19092 --create --topic ${SP_KAFKA_TOPIC} --replication-factor 1 --partitions 3
 echo "> list topics"
-docker exec -it sp-kafka /usr/bin/kafka-topics --bootstrap-server sp-kafka:9092 --list
+docker exec -it sp-kafka /usr/bin/kafka-topics --bootstrap-server sp-kafka:19092 --list
 
 # startup clickhouse env
 echo "startup clickhouse cluster..."
