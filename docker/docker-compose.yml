@@ -15,6 +15,7 @@ services:
     ports:
       - ${SP_CLICKHOUSE_1_PORT}:9000
     environment:
+      TZ: Asia/Shanghai
       CLICKHOUSE_WATCHDOG_ENABLE: 0
       CLICKHOUSE_NATS_TLS_SECURE: 0
     ulimits:
@@ -49,6 +50,7 @@ services:
     ports:
       - ${SP_CLICKHOUSE_2_PORT}:9000
     environment:
+      TZ: Asia/Shanghai
       CLICKHOUSE_WATCHDOG_ENABLE: 0
       CLICKHOUSE_NATS_TLS_SECURE: 0
     ulimits:

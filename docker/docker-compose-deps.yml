@@ -12,6 +12,7 @@ services:
     networks:
       - sptest
     environment:
+      TZ: Asia/Shanghai
       REALM: SPTEST.COM
       DOMAIN_REALM: sptest.com
       KERB_MASTER_KEY: masterkey
@@ -33,6 +34,7 @@ services:
     depends_on:
       - sp-kdc
     environment:
+      TZ: Asia/Shanghai
       ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_SERVERS: "sp-zk:2888:3888"
@@ -56,6 +58,7 @@ services:
     ports:
       - ${SP_KAFKA_PORT}:${SP_KAFKA_PORT}
     environment:
+      TZ: Asia/Shanghai
       KAFKA_ADVERTISED_LISTENERS: OUTSIDE://${SP_KAFKA_HOST}:${SP_KAFKA_PORT},INSIDE://sp-kafka:19092,SECURT://sp-kafka:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: OUTSIDE:PLAINTEXT,INSIDE:PLAINTEXT,SECURT:SASL_PLAINTEXT
       KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: GSSAPI
