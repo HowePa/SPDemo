@@ -15,6 +15,7 @@ services:
     ports:
       - ${SP_CLICKHOUSE_1_PORT}:9000
     environment:
+      TZ: Asia/Shanghai
       CLICKHOUSE_WATCHDOG_ENABLE: 0
       CLICKHOUSE_NATS_TLS_SECURE: 0
     ulimits:
@@ -22,9 +23,9 @@ services:
         soft: 262144
         hard: 262144
     volumes:
-      - ${SP_DATA_DIR:-./data}/clickhouse_1/data:/var/lib/clickhouse/
-      - ${SP_DATA_DIR:-./data}/clickhouse_1/log:/var/log/clickhouse-server/
-      - ${SP_CLICKHOUSE_CONF_DIR:-./conf}/clickhouse_1/:/etc/clickhouse-server/
+      - ${SP_DATA_DIR:-./data}/clickhouse_1:/var/lib/clickhouse/
+      - ${SP_LOG_DIR:-./log}/clickhouse_1:/var/log/clickhouse-server/
+      - ${SP_CONF_DIR:-./conf}/clickhouse_1:/etc/clickhouse-server/
       - ${SP_CLICKHOUSE_BIN_DIR}/clickhouse:/usr/bin/clickhouse
       - ${SP_CLICKHOUSE_BIN_DIR}/clickhouse-odbc-bridge:/usr/bin/clickhouse-odbc-bridge
       - ${SP_CLICKHOUSE_BIN_DIR}/clickhouse-library-bridge:/usr/bin/clickhouse-library-bridge
@@ -47,6 +48,7 @@ services:
     ports:
       - ${SP_CLICKHOUSE_2_PORT}:9000
     environment:
+      TZ: Asia/Shanghai
       CLICKHOUSE_WATCHDOG_ENABLE: 0
       CLICKHOUSE_NATS_TLS_SECURE: 0
     ulimits:
@@ -54,9 +56,9 @@ services:
         soft: 262144
         hard: 262144
     volumes:
-      - ${SP_DATA_DIR:-./data}/clickhouse_2/data:/var/lib/clickhouse/
-      - ${SP_DATA_DIR:-./data}/clickhouse_2/log:/var/log/clickhouse-server/
-      - ${SP_CLICKHOUSE_CONF_DIR:-./conf}/clickhouse_2/:/etc/clickhouse-server/
+      - ${SP_DATA_DIR:-./data}/clickhouse_2:/var/lib/clickhouse/
+      - ${SP_DATA_DIR:-./log}/clickhouse_2:/var/log/clickhouse-server/
+      - ${SP_CONF_DIR:-./conf}/clickhouse_2:/etc/clickhouse-server/
       - ${SP_CLICKHOUSE_BIN_DIR}/clickhouse:/usr/bin/clickhouse
       - ${SP_CLICKHOUSE_BIN_DIR}/clickhouse-odbc-bridge:/usr/bin/clickhouse-odbc-bridge
       - ${SP_CLICKHOUSE_BIN_DIR}/clickhouse-library-bridge:/usr/bin/clickhouse-library-bridge

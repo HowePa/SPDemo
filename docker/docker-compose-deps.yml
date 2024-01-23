@@ -13,8 +13,9 @@ services:
     networks:
       - sptest
     environment:
+      TZ: Asia/Shanghai
       ZOO_MY_ID: 1
-      ZOO_SERVERS: server.1=zoo1:2888:3888;2181
+      ZOO_SERVERS: server.1=sp-zk:2888:3888;2181
     security_opt:
       - label:disable
 
@@ -26,10 +27,11 @@ services:
     networks:
       - sptest
     environment:
+      TZ: Asia/Shanghai
       HDFS_HOST: sp-hdfs
     entrypoint: /etc/bootstrap.sh -d
     volumes:
-      - ${SP_DATA_DIR:-./data}/hdfs/logs:/usr/local/hadoop/logs
+      - ${SP_LOG_DIR:-./log}/hdfs:/usr/local/hadoop/logs
 
   sp-kafka:
     image: confluentinc/cp-kafka:5.2.0
@@ -43,6 +45,7 @@ services:
     ports:
       - ${SP_KAFKA_PORT}:${SP_KAFKA_PORT}
     environment:
+      TZ: Asia/Shanghai
       KAFKA_ADVERTISED_LISTENERS: OUTSIDE://${SP_KAFKA_HOST}:${SP_KAFKA_PORT},INSIDE://sp-kafka:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
