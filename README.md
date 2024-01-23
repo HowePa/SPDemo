@@ -1,4 +1,4 @@
-# Kafka + HDFS(hot_and_cold)
+# Kerberized Kafka
 
 ## Prepare
 
