@@ -1,6 +1,7 @@
 CREATE DATABASE IF NOT EXISTS sptest ON CLUSTER spcluster;
 
 -- Kafka consumer table
+-- 2024-01-30 14:01:31|1000|sptest|China|sptest.com|123123
 CREATE TABLE IF NOT EXISTS sptest.kafka_src_table ON CLUSTER spcluster
 (
     `timestamp` DateTime,
@@ -18,6 +19,7 @@ SETTINGS
     kafka_format = 'CSV', 
     kafka_row_delimiter = '\n', 
     format_csv_delimiter = '|', 
+    kafka_num_consumers = 10, 
     kafka_skip_broken_messages = 100, 
     kafka_handle_error_mode = 'stream';
 

@@ -22,7 +22,7 @@ echo "startup dependents..."
 docker-compose -f docker-compose-deps.yml -p sptest_deps up -d
 
 # create topic "sptest"
-docker exec -it sp-kafka /usr/bin/kafka-topics --bootstrap-server sp-kafka:19092 --create --topic ${SP_KAFKA_TOPIC} --replication-factor 1 --partitions 3
+docker exec -it sp-kafka /usr/bin/kafka-topics --bootstrap-server sp-kafka:19092 --create --topic ${SP_KAFKA_TOPIC} --replication-factor 1 --partitions 100
 echo "> list topics"
 docker exec -it sp-kafka /usr/bin/kafka-topics --bootstrap-server sp-kafka:19092 --list
 

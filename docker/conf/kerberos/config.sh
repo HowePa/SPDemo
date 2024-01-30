@@ -33,8 +33,8 @@ create_config() {
  default_realm = $REALM
  dns_lookup_realm = false
  dns_lookup_kdc = false
- ticket_lifetime = 1h
- renew_lifetime = 1h
+ ticket_lifetime = 1d
+ renew_lifetime = 7d
  forwardable = true
 
 [realms]
@@ -46,6 +46,21 @@ create_config() {
 [domain_realm]
  .$DOMAIN_REALM = $REALM
  $DOMAIN_REALM = $REALM
+EOF
+
+cat>/var/kerberos/krb5kdc/kdc.conf<<EOF
+[kdcdefaults]
+ kdc_ports = 88
+ kdc_tcp_ports = 88
+
+[realms]
+ $REALM = {
+  max_renewable_life = 7d
+  acl_file = /var/kerberos/krb5kdc/kadm5.acl
+  dict_file = /usr/share/dict/words
+  admin_keytab = /var/kerberos/krb5kdc/kadm5.keytab
+  supported_enctypes = aes256-cts:normal aes128-cts:normal des3-hmac-sha1:normal arcfour-hmac:normal des-hmac-sha1:normal des-cbc-md5:normal des-cbc-crc:normal
+ }
 EOF
 }
 

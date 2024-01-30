@@ -27,8 +27,6 @@ services:
       - ${SP_LOG_DIR:-./log}/clickhouse_1:/var/log/clickhouse-server/
       - ${SP_CONF_DIR:-./conf}/clickhouse_1:/etc/clickhouse-server/
       - ${SP_CLICKHOUSE_BIN_DIR}/clickhouse:/usr/bin/clickhouse
-      - ${SP_CLICKHOUSE_BIN_DIR}/clickhouse-odbc-bridge:/usr/bin/clickhouse-odbc-bridge
-      - ${SP_CLICKHOUSE_BIN_DIR}/clickhouse-library-bridge:/usr/bin/clickhouse-library-bridge
       - ${SP_CONF_DIR:-./conf}/keytabs:/tmp/keytab
       - ${SP_CONF_DIR:-./conf}/keytabs/krb5.conf:/etc/krb5.conf:ro
     entrypoint: bash -c "trap 'pkill tail' INT TERM; clickhouse server --config-file=/etc/clickhouse-server/config.xml --log-file=/var/log/clickhouse-server/clickhouse-server.log --errorlog-file=/var/log/clickhouse-server/clickhouse-server.err.log --daemon; coproc tail -f /dev/null; wait $$!"
@@ -62,8 +60,6 @@ services:
       - ${SP_LOG_DIR:-./log}/clickhouse_2:/var/log/clickhouse-server/
       - ${SP_CONF_DIR:-./conf}/clickhouse_2:/etc/clickhouse-server/
       - ${SP_CLICKHOUSE_BIN_DIR}/clickhouse:/usr/bin/clickhouse
-      - ${SP_CLICKHOUSE_BIN_DIR}/clickhouse-odbc-bridge:/usr/bin/clickhouse-odbc-bridge
-      - ${SP_CLICKHOUSE_BIN_DIR}/clickhouse-library-bridge:/usr/bin/clickhouse-library-bridge
       - ${SP_CONF_DIR:-./conf}/keytabs:/tmp/keytab
       - ${SP_CONF_DIR:-./conf}/keytabs/krb5.conf:/etc/krb5.conf:ro
     entrypoint: bash -c "trap 'pkill tail' INT TERM; clickhouse server --config-file=/etc/clickhouse-server/config.xml --log-file=/var/log/clickhouse-server/clickhouse-server.log --errorlog-file=/var/log/clickhouse-server/clickhouse-server.err.log --daemon; coproc tail -f /dev/null; wait $$!"
