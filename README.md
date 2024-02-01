@@ -19,6 +19,18 @@
 ./script/producer_rand --process 8
 ```
 
+## Check Kafka Assignor
+
+```bash
+# 建表
+./script/tesh.sh create
+# 统计
+./script/tesh.sh list
+./script/tesh.sh count
+# 回收
+./script/tesh.sh drop
+```
+
 ## Structure
 
 1. `./docker/docker-compose.yml`: 测试环境
