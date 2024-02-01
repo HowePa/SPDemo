@@ -1,21 +1,34 @@
 #!/bin/bash
 
-node_id=(1 2)
+num_topics=5
+node_id=(0 1)
 node_host=(${SP_CLICKHOUSE_HOST} ${SP_CLICKHOUSE_HOST})
 node_port=(${SP_CLICKHOUSE_1_PORT} ${SP_CLICKHOUSE_2_PORT})
 num_consumers=(2 4)
 
 case "$@" in
+    "create_topic")
+        for ((topic_id=0; topic_id<${num_topics}; topic_id++)); do
+            docker exec -it sp-kafka /usr/bin/kafka-topics --bootstrap-server sp-kafka:19092 --create --topic rb${topic_id} --replication-factor 1 --partitions 17
+        done
+        docker exec -it sp-kafka /usr/bin/kafka-topics --bootstrap-server sp-kafka:19092 --list
+        ;;
+    "del_topic")
+        for ((topic_id=0; topic_id<${num_topics}; topic_id++)); do
+            docker exec -it sp-kafka /usr/bin/kafka-topics --bootstrap-server sp-kafka:19092 --delete --topic rb${topic_id}
+        done
+        docker exec -it sp-kafka /usr/bin/kafka-topics --bootstrap-server sp-kafka:19092 --list
+        ;;
     "create")
 #### create database
-        for idx in {0..1}; do
+        for idx in ${node_id[@]}; do
             create_db="CREATE DATABASE IF NOT EXISTS rbtest;"
             echo "$create_db" | clickhouse-client --host ${node_host[$idx]} --port ${node_port[$idx]} -n
         done
 
 #### create consumer
-        for idx in {0..1}; do
-            for topic_id in {0..5}; do
+        for idx in ${node_id[@]}; do
+            for ((topic_id=0; topic_id<${num_topics}; topic_id++)); do
                 create_consumer="CREATE TABLE IF NOT EXISTS rbtest.consumer_rb${topic_id}
 (
     id Int32,
@@ -48,26 +61,26 @@ CREATE TABLE IF NOT EXISTS rbtest.distrib_rb ON CLUSTER spcluster
     name String
 )
 ENGINE = Distributed('spcluster', 'rbtest', 'local_rb', sipHash64(id));"
-        echo "$create_local" | clickhouse-client --host ${node_host[$idx]} --port ${node_port[$idx]} -n -t
+        echo "$create_local" | clickhouse-client --host ${node_host[0]} --port ${node_port[0]} -n -t
 
 #### create mv
-        for topic_id in {0..5}; do
+        for ((topic_id=0; topic_id<${num_topics}; topic_id++)); do
             create_mv="CREATE MATERIALIZED VIEW rbtest.mv_rb${topic_id} ON CLUSTER spcluster TO rbtest.distrib_rb AS
-    SELECT
-    id,
-    name
-    FROM rbtest.consumer_rb${topic_id};"
-            echo "$create_mv" | clickhouse-client --host ${node_host[$idx]} --port ${node_port[$idx]} -n -t
+SELECT
+id,
+name
+FROM rbtest.consumer_rb${topic_id};"
+            echo "$create_mv" | clickhouse-client --host ${node_host[0]} --port ${node_port[0]} -n -t
         done
         ;;
     "drop")
-        for idx in {0..1}; do
+        for idx in ${node_id[@]}; do
             drop_sql="DROP DATABASE IF EXISTS rbtest SYNC;"
             echo "$drop_sql" | clickhouse-client --host ${node_host[$idx]} --port ${node_port[$idx]} -n -t
         done
         ;;
     "list")
-        for idx in {0..1}; do
+        for idx in ${node_id[@]}; do
             count_sql="SELECT
 '${idx}' as node, 
 table, 
@@ -78,7 +91,7 @@ FROM system.kafka_consumers;"
         done
         ;;
     "count")
-        for idx in {0..1}; do
+        for idx in ${node_id[@]}; do
             count_sql="SELECT
 '${idx}' as node, 
 table, 
