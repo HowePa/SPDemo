@@ -22,7 +22,7 @@ case "$@" in
     "create")
         for idx in ${node_id[@]}; do
             create_db="CREATE DATABASE IF NOT EXISTS rbtest;"
-            echo "$create_db" | clickhouse-client --host ${node_host[$idx]} --port ${node_port[$idx]} -n
+            echo "$create_db" | $SP_CLICKHOUSE_BIN client --host ${node_host[$idx]} --port ${node_port[$idx]} -n
             topic_list="rb0"
             for ((topic_id=1; topic_id<${num_topics}; topic_id++)); do
                 topic_list="${topic_list},rb${topic_id}"
@@ -55,13 +55,13 @@ SELECT
 id,
 name
 FROM rbtest.consumer;"
-            echo "$create_sql" | clickhouse-client --host ${node_host[$idx]} --port ${node_port[$idx]} -n -t
+            echo "$create_sql" | $SP_CLICKHOUSE_BIN client --host ${node_host[$idx]} --port ${node_port[$idx]} -n -t
         done
         ;;
     "drop")
         for idx in ${node_id[@]}; do
             drop_sql="DROP DATABASE IF EXISTS rbtest SYNC;"
-            echo "$drop_sql" | clickhouse-client --host ${node_host[$idx]} --port ${node_port[$idx]} -n -t
+            echo "$drop_sql" | $SP_CLICKHOUSE_BIN client --host ${node_host[$idx]} --port ${node_port[$idx]} -n -t
         done
         ;;
     "list")
@@ -72,7 +72,7 @@ table,
 assignments.topic AS topics, 
 length(assignments.partition_id) AS num_kafka_parts 
 FROM system.kafka_consumers;"
-            echo "$count_sql" | clickhouse-client --host ${node_host[$idx]} --port ${node_port[$idx]} -n -t
+            echo "$count_sql" | $SP_CLICKHOUSE_BIN client --host ${node_host[$idx]} --port ${node_port[$idx]} -n -t
         done
         ;;
     "count")
@@ -82,7 +82,7 @@ FROM system.kafka_consumers;"
 table, 
 sum(length(assignments.partition_id))
 FROM system.kafka_consumers GROUP BY table;"
-            echo "$count_sql" | clickhouse-client --host ${node_host[$idx]} --port ${node_port[$idx]} -n -t
+            echo "$count_sql" | $SP_CLICKHOUSE_BIN client --host ${node_host[$idx]} --port ${node_port[$idx]} -n -t
         done
         ;;
 esac

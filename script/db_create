@@ -1,11 +1,11 @@
 #!/bin/bash
 
-clickhouse-client \
+$SP_CLICKHOUSE_BIN client \
     --host ${SP_CLICKHOUSE_HOST} \
     --port ${SP_CLICKHOUSE_1_PORT} \
     --queries-file ${SP_SRC_DIR}/script/create.sql
 
-clickhouse-client \
+$SP_CLICKHOUSE_BIN client \
     --host ${SP_CLICKHOUSE_HOST} \
     --port ${SP_CLICKHOUSE_1_PORT} \
     --query "SHOW TABLES FROM sptest"
