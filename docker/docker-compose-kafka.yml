@@ -1,0 +1,65 @@
+version: "2.3"
+
+services:
+  sp-zoo:
+    image: confluentinc/cp-zookeeper:5.2.0
+    container_name: sp-zoo
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_SERVERS: "sp-zk:2888:3888"
+    security_opt:
+      - label:disable
+
+  sp-kafka:
+    image: confluentinc/cp-kafka:5.2.0
+    container_name: sp-kafka
+    restart: always
+    depends_on:
+      - sp-zoo
+    ports:
+      - 29092:29092
+    environment:
+      TZ: Asia/Shanghai
+      KAFKA_ADVERTISED_LISTENERS: OUTSIDE://${SP_HOST}:29092,INSIDE://sp-kafka:19092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: OUTSIDE:PLAINTEXT,INSIDE:PLAINTEXT
+      KAFKA_SASL_KERBEROS_SERVICE_NAME: kafka
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: sp-zoo:2181
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    security_opt:
+      - label:disable
+
+  sp-clickhouse:
+    image: clickhouse/integration-test:latest
+    container_name: sp-clickhouse
+    hostname: clickhouse
+    depends_on:
+      - sp-kafka
+    ports:
+      - 9000:9000
+    environment:
+      TZ: Asia/Shanghai
+      CLICKHOUSE_WATCHDOG_ENABLE: 0
+      CLICKHOUSE_NATS_TLS_SECURE: 0
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - ${SP_BIN_DIR}/clickhouse:/usr/bin/clickhouse
+      - ${SP_WORKDIR}/docker/conf:/etc/clickhouse-server/
+      - ${SP_WORKDIR}/docker/data:/var/lib/clickhouse/
+      - ${SP_WORKDIR}/docker/log:/var/log/clickhouse-server/
+    entrypoint: bash -c "trap 'pkill tail' INT TERM; clickhouse server --config-file=/etc/clickhouse-server/config.xml --log-file=/var/log/clickhouse-server/clickhouse-server.log --errorlog-file=/var/log/clickhouse-server/clickhouse-server.err.log --daemon; coproc tail -f /dev/null; wait $$!"
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+      - IPC_LOCK
+      - SYS_NICE
+      # for umount/mount on fly
+      - SYS_ADMIN

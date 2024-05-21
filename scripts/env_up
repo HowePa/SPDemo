@@ -1,0 +1,24 @@
+#!/bin/bash
+
+pushd ${SP_WORKDIR}/docker>/dev/null
+
+### prepare ###
+mkdir -p data
+mkdir -p log
+echo "SP_WORKDIR=$SP_WORKDIR
+SP_BIN_DIR=$SP_BIN_DIR
+SP_HOST=$SP_HOST">.env
+cat .env
+
+### start up ###
+ENV_TARGET=${1:-clickhouse}
+case "$ENV_TARGET" in
+    "clickhouse")
+        docker compose -f docker-compose.yml up -d
+        ;;
+    "kafka")
+        docker compose -f docker-compose-kafka.yml up -d
+        ;;
+esac
+
+popd>/dev/null

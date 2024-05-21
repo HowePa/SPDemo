@@ -21,9 +21,11 @@
 
             [1]: https://github.com/pocoproject/poco/blob/poco-1.9.4-release/Foundation/include/Poco/Logger.h#L105-L114
         -->
-        <level>trace</level>
+        <level>debug</level>
         <log>/var/log/clickhouse-server/clickhouse-server.log</log>
         <errorlog>/var/log/clickhouse-server/clickhouse-server.err.log</errorlog>
+        <stdout>/var/log/clickhouse-server/clickhouse-server.stdout</stdout>
+        <stderr>/var/log/clickhouse-server/clickhouse-server.stderr</stderr>
         <!-- Rotation policy
              See https://github.com/pocoproject/poco/blob/poco-1.9.4-release/Foundation/include/Poco/FileChannel.h#L54-L85
           -->

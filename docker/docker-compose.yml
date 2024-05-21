@@ -1,19 +1,12 @@
-version: "3"
-
-networks:
-  sptest_deps_sptest:
-    external: true
+version: "2.3"
 
 services:
-  sp-ch-1:
+  sp-clickhouse:
     image: clickhouse/integration-test:latest
-    container_name: sp-ch-1
-    hostname: sp-ch-1
-    restart: always
-    networks:
-      - sptest_deps_sptest
+    container_name: sp-clickhouse
+    hostname: clickhouse
     ports:
-      - ${SP_CLICKHOUSE_1_PORT}:9000
+      - 9000:9000
     environment:
       TZ: Asia/Shanghai
       CLICKHOUSE_WATCHDOG_ENABLE: 0
@@ -23,12 +16,10 @@ services:
         soft: 262144
         hard: 262144
     volumes:
-      - ${SP_DATA_DIR:-./data}/clickhouse_1:/var/lib/clickhouse/
-      - ${SP_LOG_DIR:-./log}/clickhouse_1:/var/log/clickhouse-server/
-      - ${SP_CONF_DIR:-./conf}/clickhouse_1:/etc/clickhouse-server/
-      - ${SP_CLICKHOUSE_BIN_DIR}/clickhouse:/usr/bin/clickhouse
-      - ${SP_CONF_DIR:-./conf}/keytabs:/tmp/keytab
-      - ${SP_CONF_DIR:-./conf}/keytabs/krb5.conf:/etc/krb5.conf:ro
+      - ${SP_BIN_DIR}/clickhouse:/usr/bin/clickhouse
+      - ${SP_WORKDIR}/docker/conf:/etc/clickhouse-server/
+      - ${SP_WORKDIR}/docker/data:/var/lib/clickhouse/
+      - ${SP_WORKDIR}/docker/log:/var/log/clickhouse-server/
     entrypoint: bash -c "trap 'pkill tail' INT TERM; clickhouse server --config-file=/etc/clickhouse-server/config.xml --log-file=/var/log/clickhouse-server/clickhouse-server.log --errorlog-file=/var/log/clickhouse-server/clickhouse-server.err.log --daemon; coproc tail -f /dev/null; wait $$!"
     cap_add:
       - SYS_PTRACE
@@ -37,37 +28,3 @@ services:
       - SYS_NICE
       # for umount/mount on fly
       - SYS_ADMIN
-    
-  sp-ch-2:
-    image: clickhouse/integration-test:latest
-    container_name: sp-ch-2
-    hostname: sp-ch-2
-    restart: always
-    networks:
-      - sptest_deps_sptest
-    ports:
-      - ${SP_CLICKHOUSE_2_PORT}:9000
-    environment:
-      TZ: Asia/Shanghai
-      CLICKHOUSE_WATCHDOG_ENABLE: 0
-      CLICKHOUSE_NATS_TLS_SECURE: 0
-    ulimits:
-      nofile:
-        soft: 262144
-        hard: 262144
-    volumes:
-      - ${SP_DATA_DIR:-./data}/clickhouse_2:/var/lib/clickhouse/
-      - ${SP_LOG_DIR:-./log}/clickhouse_2:/var/log/clickhouse-server/
-      - ${SP_CONF_DIR:-./conf}/clickhouse_2:/etc/clickhouse-server/
-      - ${SP_CLICKHOUSE_BIN_DIR}/clickhouse:/usr/bin/clickhouse
-      - ${SP_CONF_DIR:-./conf}/keytabs:/tmp/keytab
-      - ${SP_CONF_DIR:-./conf}/keytabs/krb5.conf:/etc/krb5.conf:ro
-    entrypoint: bash -c "trap 'pkill tail' INT TERM; clickhouse server --config-file=/etc/clickhouse-server/config.xml --log-file=/var/log/clickhouse-server/clickhouse-server.log --errorlog-file=/var/log/clickhouse-server/clickhouse-server.err.log --daemon; coproc tail -f /dev/null; wait $$!"
-    cap_add:
-      - SYS_PTRACE
-      - NET_ADMIN
-      - IPC_LOCK
-      - SYS_NICE
-      # for umount/mount on fly
-      - SYS_ADMIN
-      
