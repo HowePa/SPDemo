@@ -14,7 +14,7 @@ SETTINGS
     format_csv_delimiter='#',
     format_csv_allow_double_quotes = 0,
     kafka_num_consumers = 2,
-    kafka_skip_broken_messages = 100;
+    kafka_handle_error_mode = 'stream';
 
 CREATE TABLE IF NOT EXISTS test_kafka.tar
 (
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS test_kafka.tar
 ENGINE = MergeTree
 ORDER BY id;
 
-CREATE MATERIALIZED VIEW test_kafka.mv TO test_kafka.tar AS
+CREATE MATERIALIZED VIEW IF NOT EXISTS test_kafka.mv TO test_kafka.tar AS
 SELECT
     id,
     body
@@ -43,15 +43,15 @@ CREATE TABLE IF NOT EXISTS test_kafka.err
 ENGINE = MergeTree
 ORDER BY (topic, offset);
 
-CREATE MATERIALIZED VIEW test_kafka.mv_err TO test_kafka.err AS
+CREATE MATERIALIZED VIEW IF NOT EXISTS test_kafka.mv_err TO test_kafka.err AS
 SELECT
-    _topic,
-    _key,
-    _offset,
-    _timestamp,
-    _partition,
-    _raw_message,
-    _error
+    _topic AS topic,
+    _key AS key,
+    _offset AS offset,
+    _timestamp AS timestamp,
+    _partition AS partition,
+    _raw_message AS raw_message,
+    _error AS error
 FROM test_kafka.src;
 
 SHOW TABLES FROM test_kafka;
